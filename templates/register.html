@@ -5,130 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice Registration - SayPass</title>
     <style>
-        /* Basic dark neon styling - You can expand this */
+        /* Professional Dark Theme with Subtle Animations */
         body {
-            font-family: sans-serif;
-            background-color: #121212;
-            color: #f0f0f0;
+            font-family: 'Open Sans', sans-serif;
+            background-color: #121826; /* Dark Navy */
+            color: #e0f7fa; /* Light Cyan */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            overflow-y: auto; /* Enable scrolling for content overflow */
         }
+
         .container {
-            background-color: #1e1e1e;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            background-color: rgba(30, 41, 59, 0.9); /* Dark Blue Overlay */
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             text-align: center;
+            z-index: 1;
+            width: 80%;
+            max-width: 900px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out 0.5s forwards, slideUp 0.8s ease-out 0.5s forwards;
         }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); }
+        }
+
         h1 {
-            color: #ff69b4; /* Pink */
-            margin-bottom: 20px;
+            color: #64ffda; /* Teal Accent */
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.7);
+            margin-bottom: 40px;
+            font-size: 2.8em;
+            letter-spacing: 0.03em;
         }
+
         p {
-            color: #8a8a8a;
+            color: #a8b2d1; /* Light Grey Blue */
             margin-bottom: 30px;
+            font-size: 1.1em;
+            line-height: 1.7;
+            opacity: 0.8;
         }
+
         .step {
+            background-color: rgba(44, 62, 80, 0.8); /* Darker Blue Step */
+            padding: 30px;
+            border-radius: 8px;
             margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #333;
-            border-radius: 5px;
             text-align: left;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(100, 255, 218, 0.2);
         }
+
         h3 {
-            color: #add8e6; /* Light Blue */
+            color: #8ee8fa; /* Light Teal */
             margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.4em;
         }
+
         textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #555;
-            border-radius: 4px;
-            background-color: #222;
-            color: #f0f0f0;
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(136, 146, 176, 0.3);
+            border-radius: 6px;
+            background-color: rgba(30, 41, 59, 0.7);
+            color: #e0f7fa;
             font-family: monospace;
             font-size: 1em;
             box-sizing: border-box;
         }
+
         button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
+            padding: 14px 28px;
+            border: 2px solid #64ffda; /* Teal Border */
+            border-radius: 8px;
+            background-color: transparent;
+            color: #64ffda;
+            font-size: 1.1em;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            background-color: #6a5acd; /* Violet */
-            color: #f0f0f0;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease-in-out;
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
+            margin-right: 10px;
         }
+
         button:hover {
-            background-color: #836fff;
+            background-color: rgba(100, 255, 218, 0.1);
+            color: #ccf9fa;
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.4);
+            transform: translateY(-2px);
         }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 0 8px rgba(100, 255, 218, 0.3);
+        }
+
         button:disabled {
-            background-color: #444;
+            border-color: #718096;
+            color: #718096;
+            background-color: rgba(44, 62, 80, 0.5);
             cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
+
         #registration_status {
-            margin-top: 20px;
-            color: #00ff7f; /* Green for success, can be changed for errors */
+            margin-top: 30px;
+            color: #ffcb6b; /* Amber Status */
+            font-size: 1.1em;
+            font-weight: bold;
         }
+
+        audio {
+            display: block;
+            margin-top: 20px;
+            border: 1px solid rgba(136, 146, 176, 0.3);
+            border-radius: 6px;
+            background-color: rgba(30, 41, 59, 0.7);
+            width: 100%;
+        }
+
         .back-button {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            border: 1px solid #8a8a8a;
-            border-radius: 4px;
-            color: #8a8a8a;
+            margin-top: 40px;
+            padding: 12px 24px;
+            border: 1px solid #a8b2d1;
+            border-radius: 8px;
+            color: #a8b2d1;
             text-decoration: none;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease-in-out;
+            box-shadow: 0 0 8px rgba(168, 178, 209, 0.2);
         }
+
         .back-button:hover {
-            background-color: #333;
-            color: #f0f0f0;
+            background-color: rgba(168, 178, 209, 0.1);
+            color: #e0f7fa;
+            box-shadow: 0 0 12px rgba(168, 178, 209, 0.4);
+            transform: translateY(-2px);
         }
+
         .alert {
-            color: #ff4d4d; /* Red for error */
+            color: #ff6f61; /* Salmon Alert */
             margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ff4d4d;
-            border-radius: 4px;
-            background-color: #331a1a;
+            padding: 15px;
+            border: 1px solid #ff6f61;
+            border-radius: 6px;
+            background-color: rgba(50, 30, 40, 0.7);
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <h1>Voice Registration</h1>
-        <p>Please follow the instructions below to register your voice.</p>
+        <p>Secure your account by registering your unique voiceprint.</p>
 
         <div id="registration-steps">
             <div class="step">
                 <h3>Voice Sample 1</h3>
-                <p>Please read the following aloud:</p>
-                <textarea readonly rows="7">Hello! I’m reading this passage to help train a voice recognition system.
-Every sound I produce, from soft whispers to clear and crisp words, helps the model learn my unique vocal signature.
-I speak naturally, using low and high tones, short and long words, and a variety of expressions.</textarea>
-                <button id="record1">Record Voice 1</button>
+                <p>Read the following phrase clearly:</p>
+                <textarea readonly rows="5">Hello! I’m reading this passage to help train a voice recognition system. Every sound I produce, from soft whispers to clear and crisp words, helps the model learn my unique vocal signature. I speak naturally, using low and high tones, short and long words, and a variety of expressions. As an example, the quick brown fox jumps over the lazy dog.</textarea>
+                <button id="record1">Record Sample 1</button>
                 <audio id="audio1" controls></audio>
             </div>
 
             <div class="step">
                 <h3>Voice Sample 2</h3>
-                <p>Please read the following aloud:</p>
-                <textarea readonly rows="7">Hello! I’m reading this passage to help train a voice recognition system.
-Every sound I produce, from soft whispers to clear and crisp words, helps the model learn my unique vocal signature.
-I speak naturally, using low and high tones, short and long words, and a variety of expressions.</textarea>
-                <button id="record2">Record Voice 2</button>
+                <p>Read the same phrase again:</p>
+                <textarea readonly rows="5">Hello! I’m reading this passage to help train a voice recognition system. Every sound I produce, from soft whispers to clear and crisp words, helps the model learn my unique vocal signature. I speak naturally, using low and high tones, short and long words, and a variety of expressions. As an example, the quick brown fox jumps over the lazy dog.</textarea>
+                <button id="record2">Record Sample 2</button>
                 <audio id="audio2" controls></audio>
             </div>
 
             <div class="step">
-                <h3>Your Secret Phrase</h3>
-                <p>Please speak your secret phrase (password-like):</p>
-                <button id="record_prompt">Record Prompt</button>
+                <h3>Set Your Secret Phrase</h3>
+                <p>Speak a unique phrase you'll use for authentication:</p>
+                <button id="record_prompt">Record Secret Phrase</button>
                 <audio id="audio_prompt" controls></audio>
             </div>
 
@@ -136,7 +199,7 @@ I speak naturally, using low and high tones, short and long words, and a variety
             <p id="registration_status"></p>
         </div>
 
-        <a href="/" class="button back-button">Back to Home</a>
+        <a href="/" class="back-button">Back to Home</a>
         <div id="alert-container"></div>
     </div>
 
@@ -145,31 +208,21 @@ I speak naturally, using low and high tones, short and long words, and a variety
         let recorder;
 
         async function startRecording(buttonId, audioId) {
-            console.log('startRecording - Recorder state:', recorder ? recorder.state : 'undefined');
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                console.log('getUserMedia successful - Audio tracks:');
-                stream.getAudioTracks().forEach(track => console.log('Audio track:', track));
-
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const source = audioContext.createMediaStreamSource(stream);
-
-                // Using a widely supported MIME type
                 recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-
                 const chunks = [];
 
                 recorder.ondataavailable = event => {
-                    console.log('ondataavailable:', event);
                     if (event.data.size > 0) {
                         chunks.push(event.data);
                     }
                 };
 
                 recorder.onstop = async () => {
-                    console.log('onstop - Chunks:', chunks);
                     const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-                    console.log("Blob MIME Type (" + buttonId + "):", audioBlob.type);
                     recordings[buttonId] = audioBlob;
                     const audioUrl = URL.createObjectURL(audioBlob);
                     document.getElementById(audioId).src = audioUrl;
@@ -187,11 +240,11 @@ I speak naturally, using low and high tones, short and long words, and a variety
                 console.error('getUserMedia error:', err);
                 let errorMessage = "Error accessing microphone.";
                 if (err.name === 'NotAllowedError') {
-                    errorMessage = "Microphone access was denied. Please check your browser settings to allow microphone access for this site.";
+                    errorMessage = "Microphone access denied. Please check browser settings.";
                 } else if (err.name === 'NotFoundError') {
-                    errorMessage = "No microphone device found. Please ensure you have a microphone connected and enabled.";
+                    errorMessage = "No microphone found. Ensure a microphone is connected.";
                 } else if (err.name === 'NotReadableError') {
-                    errorMessage = "The microphone is already in use by another application.";
+                    errorMessage = "Microphone is in use by another application.";
                 }
                 document.getElementById('registration_status').textContent = errorMessage;
                 const alertContainer = document.getElementById('alert-container');
@@ -201,21 +254,18 @@ I speak naturally, using low and high tones, short and long words, and a variety
                         alertContainer.innerHTML = '';
                     }, 5000);
                 }
-                // Revert button state on error
                 const button = document.getElementById(buttonId);
                 if (button) {
-                    button.textContent = 'Record Again';
+                    button.textContent = 'Record Sample ' + buttonId.slice(-1); // Revert button text
                     button.onclick = () => startRecording(buttonId, audioId);
                 }
             }
         }
 
         function stopRecording(buttonId, audioId) {
-            console.log('stopRecording - Recorder state:', recorder ? recorder.state : 'undefined');
             if (recorder && recorder.state === 'recording') {
                 recorder.stop();
             }
-            // The onstop event handler will handle the rest
         }
 
         function checkIfAllRecorded() {
@@ -231,14 +281,8 @@ I speak naturally, using low and high tones, short and long words, and a variety
         document.getElementById('submit_registration').addEventListener('click', async () => {
             document.getElementById('registration_status').textContent = 'Processing...';
             const formData = new FormData();
-            if (recordings['record1']) {
-                formData.append('audio_train1', recordings['record1'], 'voice_train1.webm'); // Use .webm extension
-            }
-            if (recordings['record2']) {
-                formData.append('audio_train2', recordings['record2'], 'voice_train2.webm'); // Use .webm extension
-            }
-            if (recordings['record_prompt']) {
-                formData.append('audio_prompt', recordings['record_prompt'], 'voice_prompt.webm'); // Use .webm extension
+            for (const key in recordings) {
+                formData.append(key.replace('record', 'audio_train').replace('prompt', 'prompt'), recordings[key], `${key}.webm`);
             }
 
             try {

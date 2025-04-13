@@ -9,6 +9,7 @@ text_para = """
 Hello! I’m reading this passage to help train a voice recognition system.
 Every sound I produce, from soft whispers to clear and crisp words, helps the model learn my unique vocal signature.
 I speak naturally, using low and high tones, short and long words, and a variety of expressions.
+As an example, the quick brown fox jumps over the lazy dog.
 """
 
 def record_audio(filename):

@@ -5,91 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice Authentication - SayPass</title>
     <style>
-        /* Basic dark neon styling - You can expand this */
+        /* Professional Dark Theme with Subtle Animations */
         body {
-            font-family: sans-serif;
-            background-color: #121212;
-            color: #f0f0f0;
+            font-family: 'Open Sans', sans-serif;
+            background-color: #121826; /* Dark Navy */
+            color: #e0f7fa; /* Light Cyan */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
         }
+
         .container {
-            background-color: #1e1e1e;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            background-color: rgba(30, 41, 59, 0.9); /* Dark Blue Overlay */
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             text-align: center;
+            z-index: 1;
+            width: 80%;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out 0.5s forwards, slideUp 0.8s ease-out 0.5s forwards;
         }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); }
+        }
+
         h1 {
-            color: #4caf50; /* Green */
+            color: #64ffda; /* Teal Accent */
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.7);
+            margin-bottom: 30px;
+            font-size: 2.8em;
+            letter-spacing: 0.03em;
+        }
+
+        p {
+            color: #a8b2d1; /* Light Grey Blue */
+            margin-bottom: 40px;
+            font-size: 1.15em;
+            line-height: 1.7;
+            opacity: 0.8;
+        }
+
+        button {
+            padding: 16px 32px;
+            border: 2px solid #64ffda; /* Teal Border */
+            border-radius: 8px;
+            background-color: transparent;
+            color: #64ffda;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease-in-out;
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
             margin-bottom: 20px;
         }
-        p {
-            color: #8a8a8a;
-            margin-bottom: 30px;
-        }
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            background-color: #00bcd4; /* Cyan */
-            color: #f0f0f0;
-        }
+
         button:hover {
-            background-color: #4dd0e1;
+            background-color: rgba(100, 255, 218, 0.1);
+            color: #ccf9fa;
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.4);
+            transform: translateY(-2px);
         }
-        #auth_status {
-            margin-top: 20px;
-            color: #ffeb3b; /* Yellow */
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 0 8px rgba(100, 255, 218, 0.3);
         }
+
         audio {
             display: block;
             margin-top: 20px;
+            border: 1px solid rgba(136, 146, 176, 0.3);
+            border-radius: 6px;
+            background-color: rgba(30, 41, 59, 0.7);
+            width: 100%;
         }
+
+        #auth_status {
+            margin-top: 30px;
+            color: #ffcb6b; /* Amber Status */
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
         .back-button {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            border: 1px solid #8a8a8a;
-            border-radius: 4px;
-            color: #8a8a8a;
+            margin-top: 30px;
+            padding: 12px 24px;
+            border: 1px solid #a8b2d1;
+            border-radius: 8px;
+            color: #a8b2d1;
             text-decoration: none;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease-in-out;
+            box-shadow: 0 0 8px rgba(168, 178, 209, 0.2);
         }
+
         .back-button:hover {
-            background-color: #333;
-            color: #f0f0f0;
+            background-color: rgba(168, 178, 209, 0.1);
+            color: #e0f7fa;
+            box-shadow: 0 0 12px rgba(168, 178, 209, 0.4);
+            transform: translateY(-2px);
         }
+
         .alert {
-            color: #ff4d4d; /* Red for error */
+            color: #ff6f61; /* Salmon Alert */
             margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ff4d4d;
-            border-radius: 4px;
-            background-color: #331a1a;
+            padding: 15px;
+            border: 1px solid #ff6f61;
+            border-radius: 6px;
+            background-color: rgba(50, 30, 40, 0.7);
+        }
+
+        #authenticate_form {
+            margin-top: 20px;
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <h1>Voice Authentication</h1>
-        <p>Speak the secret phrase you used during registration to authenticate.</p>
+        <p>Speak your secret phrase to verify your identity.</p>
 
         <button id="record_auth">Record Voice</button>
         <audio id="audio_test" controls></audio>
 
         <form id="authenticate_form">
-            <button type="submit" style="margin-top: 20px;">Authenticate</button>
+            <button type="submit">Authenticate</button>
         </form>
 
         <p id="auth_status"></p>
-        <a href="/" class="button back-button">Back to Home</a>
+        <a href="/" class="back-button">Back to Home</a>
         <div id="alert-container"></div>
     </div>
 
@@ -98,31 +152,21 @@
         let recordedAuthAudio;
 
         async function startAuthRecording() {
-            console.log('startAuthRecording - Recorder state:', recorder ? recorder.state : 'undefined');
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                console.log('getUserMedia successful - Audio tracks:');
-                stream.getAudioTracks().forEach(track => console.log('Audio track:', track));
-
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const source = audioContext.createMediaStreamSource(stream);
-
-                // Using a widely supported MIME type
                 recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-
                 const chunks = [];
 
                 recorder.ondataavailable = event => {
-                    console.log('ondataavailable:', event);
                     if (event.data.size > 0) {
                         chunks.push(event.data);
                     }
                 };
 
                 recorder.onstop = async () => {
-                    console.log('onstop - Chunks:', chunks);
                     const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-                    console.log("Blob MIME Type:", audioBlob.type);
                     recordedAuthAudio = audioBlob;
                     const audioUrl = URL.createObjectURL(audioBlob);
                     document.getElementById('audio_test').src = audioUrl;
@@ -139,11 +183,11 @@
                 console.error("Error accessing microphone:", err);
                 let errorMessage = "Error accessing microphone.";
                 if (err.name === 'NotAllowedError') {
-                    errorMessage = "Microphone access was denied. Please check your browser settings to allow microphone access for this site.";
+                    errorMessage = "Microphone access denied. Please check browser settings.";
                 } else if (err.name === 'NotFoundError') {
-                    errorMessage = "No microphone device found. Please ensure you have a microphone connected and enabled.";
+                    errorMessage = "No microphone found. Ensure a microphone is connected.";
                 } else if (err.name === 'NotReadableError') {
-                    errorMessage = "The microphone is already in use by another application.";
+                    errorMessage = "Microphone is in use by another application.";
                 }
                 document.getElementById('auth_status').textContent = errorMessage;
                 const alertContainer = document.getElementById('alert-container');
@@ -153,17 +197,15 @@
                         alertContainer.innerHTML = '';
                     }, 5000);
                 }
-                // Revert button state on error
                 const button = document.getElementById('record_auth');
                 if (button) {
-                    button.textContent = 'Record Voice'; // Initial text
+                    button.textContent = 'Record Voice';
                     button.onclick = startAuthRecording;
                 }
             }
         }
 
         function stopAuthRecording() {
-            console.log('stopAuthRecording - Recorder state:', recorder ? recorder.state : 'undefined');
             if (recorder && recorder.state === 'recording') {
                 recorder.stop();
             }

@@ -3,89 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SayPass</title>
+    <title>SayPass - Secure Voice Authentication</title>
     <style>
-        /* Basic dark neon styling */
+        /* Professional Dark Theme with Subtle Animations */
         body {
-            font-family: sans-serif;
-            background-color: #121212;
-            color: #f0f0f0;
+            font-family: 'Open Sans', sans-serif;
+            background-color: #121826; /* Dark Navy */
+            color: #e0f7fa; /* Light Cyan */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
+
+        /* Animated Background (Subtle Particle Flow) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.95));
+            z-index: -2;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
         .container {
-            background-color: #1e1e1e;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            background-color: rgba(30, 41, 59, 0.9); /* Dark Blue Overlay */
+            padding: 70px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             text-align: center;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out 0.5s forwards, slideUp 0.8s ease-out 0.5s forwards;
         }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); }
+        }
+
         h1 {
-            color: #ff69b4; /* Pink */
-            margin-bottom: 20px;
-        }
-        p {
-            color: #8a8a8a;
+            color: #64ffda; /* Teal Accent */
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.7);
             margin-bottom: 30px;
+            font-size: 3.5em;
+            letter-spacing: 0.05em;
         }
-        .options a {
+
+        p {
+            color: #a8b2d1; /* Light Grey Blue */
+            margin-bottom: 40px;
+            font-size: 1.15em;
+            line-height: 1.8;
+            opacity: 0.8;
+        }
+
+        .button {
             display: inline-block;
-            padding: 12px 24px;
-            margin: 0 10px;
-            border: 2px solid #add8e6; /* Light Blue */
-            border-radius: 5px;
-            color: #add8e6;
+            padding: 18px 36px;
+            border: 2px solid #64ffda; /* Teal Border */
+            border-radius: 8px;
+            background-color: transparent;
+            color: #64ffda;
+            font-size: 1.2em;
             text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease-in-out;
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
         }
-        .options a:hover {
-            background-color: #add8e6;
-            color: #1e1e1e;
+
+        .button:hover {
+            background-color: rgba(100, 255, 218, 0.15);
+            color: #ccf9fa;
+            box-shadow: 0 0 20px rgba(100, 255, 218, 0.5);
+            transform: translateY(-3px);
         }
-        .alert {
-            color: #ff4d4d; /* Red for error */
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ff4d4d;
-            border-radius: 4px;
-            background-color: #331a1a;
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.4);
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="particles-js"></div>
     <div class="container">
-        <h1>SayPass</h1>
-        <p>Your voice-powered authentication system</p>
-        <div class="options">
-            <a href="/register" class="button register-button">Register Voice</a>
-            <a href="/authenticate" class="button authenticate-button">Authenticate</a>
-        </div>
-        <div id="alert-container"></div>
+        <h1><span style="color: #86c9ff;">Say</span>Pass</h1>
+        <p>Experience the future of secure access with our innovative voice authentication technology.</p>
+        <a href="/register" class="button">Get Started</a>
+        <a href="/authenticate_page" class="button">Authenticate Now</a>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const authenticateButton = document.querySelector('.authenticate-button');
-            authenticateButton.addEventListener('click', function(event) {
-                fetch('/my_voice_embeddings.npy')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('No registered voice data found.');
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 80,
+                    density: {
+                        enable: true,
+                        value_area: 800
                     }
-                    return response.blob();
-                })
-                .catch(error => {
-                    event.preventDefault();
-                    const alertContainer = document.getElementById('alert-container');
-                    alertContainer.innerHTML = `<div class="alert">Alert: Please register your voice for authentication first.</div>`;
-                    setTimeout(() => {
-                        alertContainer.innerHTML = '';
-                    }, 3000); // Clear alert after 3 seconds
-                });
-            });
+                },
+                color: {
+                    value: '#64ffda'
+                },
+                shape: {
+                    type: 'circle',
+                    stroke: {
+                        width: 0,
+                        color: '#000000'
+                    },
+                    polygon: {
+                        nb_sides: 5
+                    },
+                    image: {
+                        src: 'img/github.svg',
+                        width: 100,
+                        height: 100
+                    }
+                },
+                opacity: {
+                    value: 0.5,
+                    random: true,
+                    anim: {
+                        enable: false,
+                        speed: 1,
+                        opacity_min: 0.1,
+                        sync: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: false,
+                        speed: 40,
+                        size_min: 0.1,
+                        sync: false
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#8892b0',
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: true,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false,
+                    attract: {
+                        enable: false,
+                        rotateX: 600,
+                        rotateY: 1200
+                    }
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: 'grab'
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: 'push'
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 140,
+                        line_linked: {
+                            opacity: 1
+                        }
+                    },
+                    bubble: {
+                        distance: 250,
+                        size: 0,
+                        duration: 2,
+                        opacity: 0,
+                        speed: 3
+                    },
+                    repulse: {
+                        distance: 100,
+                        duration: 0.4
+                    },
+                    push: {
+                        particles_nb: 4
+                    },
+                    remove: {
+                        particles_nb: 2
+                    }
+                }
+            },
+            retina_detect: true
         });
     </script>
 </body>
