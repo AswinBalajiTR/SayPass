@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Authentication - SayPass</title>
+    <style>
+        /* Basic dark neon styling - You can expand this */
+        body {
+            font-family: sans-serif;
+            background-color: #121212;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        h1 {
+            color: #4caf50; /* Green */
+            margin-bottom: 20px;
+        }
+        p {
+            color: #8a8a8a;
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: #00bcd4; /* Cyan */
+            color: #f0f0f0;
+        }
+        button:hover {
+            background-color: #4dd0e1;
+        }
+        #auth_status {
+            margin-top: 20px;
+            color: #ffeb3b; /* Yellow */
+        }
+        audio {
+            display: block;
+            margin-top: 20px;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid #8a8a8a;
+            border-radius: 4px;
+            color: #8a8a8a;
+            text-decoration: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #333;
+            color: #f0f0f0;
+        }
+        .alert {
+            color: #ff4d4d; /* Red for error */
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ff4d4d;
+            border-radius: 4px;
+            background-color: #331a1a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voice Authentication</h1>
+        <p>Speak the secret phrase you used during registration to authenticate.</p>
+
+        <button id="record_auth">Record Voice</button>
+        <audio id="audio_test" controls></audio>
+
+        <form id="authenticate_form">
+            <button type="submit" style="margin-top: 20px;">Authenticate</button>
+        </form>
+
+        <p id="auth_status"></p>
+        <a href="/" class="button back-button">Back to Home</a>
+        <div id="alert-container"></div>
+    </div>
+
+    <script>
+        let recorder;
+        let recordedAuthAudio;
+
+        async function startAuthRecording() {
+            console.log('startAuthRecording - Recorder state:', recorder ? recorder.state : 'undefined');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log('getUserMedia successful - Audio tracks:');
+                stream.getAudioTracks().forEach(track => console.log('Audio track:', track));
+
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+
+                // Using a widely supported MIME type
+                recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+                const chunks = [];
+
+                recorder.ondataavailable = event => {
+                    console.log('ondataavailable:', event);
+                    if (event.data.size > 0) {
+                        chunks.push(event.data);
+                    }
+                };
+
+                recorder.onstop = async () => {
+                    console.log('onstop - Chunks:', chunks);
+                    const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+                    console.log("Blob MIME Type:", audioBlob.type);
+                    recordedAuthAudio = audioBlob;
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    document.getElementById('audio_test').src = audioUrl;
+                    stream.getTracks().forEach(track => track.stop());
+                    document.getElementById('record_auth').textContent = 'Record Again';
+                    document.getElementById('record_auth').onclick = startAuthRecording;
+                };
+
+                recorder.start();
+                document.getElementById('record_auth').textContent = 'Stop Recording';
+                document.getElementById('record_auth').onclick = stopAuthRecording;
+
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+                let errorMessage = "Error accessing microphone.";
+                if (err.name === 'NotAllowedError') {
+                    errorMessage = "Microphone access was denied. Please check your browser settings to allow microphone access for this site.";
+                } else if (err.name === 'NotFoundError') {
+                    errorMessage = "No microphone device found. Please ensure you have a microphone connected and enabled.";
+                } else if (err.name === 'NotReadableError') {
+                    errorMessage = "The microphone is already in use by another application.";
+                }
+                document.getElementById('auth_status').textContent = errorMessage;
+                const alertContainer = document.getElementById('alert-container');
+                if (alertContainer) {
+                    alertContainer.innerHTML = `<div class="alert">${errorMessage}</div>`;
+                    setTimeout(() => {
+                        alertContainer.innerHTML = '';
+                    }, 5000);
+                }
+                // Revert button state on error
+                const button = document.getElementById('record_auth');
+                if (button) {
+                    button.textContent = 'Record Voice'; // Initial text
+                    button.onclick = startAuthRecording;
+                }
+            }
+        }
+
+        function stopAuthRecording() {
+            console.log('stopAuthRecording - Recorder state:', recorder ? recorder.state : 'undefined');
+            if (recorder && recorder.state === 'recording') {
+                recorder.stop();
+            }
+        }
+
+        document.getElementById('authenticate_form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!recordedAuthAudio) {
+                document.getElementById('auth_status').textContent = 'Please record your voice first.';
+                return;
+            }
+
+            document.getElementById('auth_status').textContent = 'Authenticating...';
+            const formData = new FormData();
+            formData.append('audio_test', recordedAuthAudio, 'test_voice.webm');
+
+            try {
+                const response = await fetch('/authenticate', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                document.getElementById('auth_status').textContent = data.message;
+                if (data.success) {
+                    // Optionally redirect on successful authentication
+                    // window.location.href = '/dashboard';
+                } else {
+                    const alertContainer = document.getElementById('alert-container');
+                    if (alertContainer) {
+                        alertContainer.innerHTML = `<div class="alert">${data.message}</div>`;
+                        setTimeout(() => {
+                            alertContainer.innerHTML = '';
+                        }, 5000);
+                    }
+                }
+            } catch (error) {
+                console.error("Error during authentication:", error);
+                document.getElementById('auth_status').textContent = 'Authentication failed.';
+            }
+        });
+
+        document.getElementById('record_auth').onclick = startAuthRecording;
+    </script>
+</body>
+</html>

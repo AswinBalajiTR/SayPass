@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Registration - SayPass</title>
+    <style>
+        /* Basic dark neon styling - You can expand this */
+        body {
+            font-family: sans-serif;
+            background-color: #121212;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        h1 {
+            color: #ff69b4; /* Pink */
+            margin-bottom: 20px;
+        }
+        p {
+            color: #8a8a8a;
+            margin-bottom: 30px;
+        }
+        .step {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            text-align: left;
+        }
+        h3 {
+            color: #add8e6; /* Light Blue */
+            margin-top: 0;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #222;
+            color: #f0f0f0;
+            font-family: monospace;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: #6a5acd; /* Violet */
+            color: #f0f0f0;
+        }
+        button:hover {
+            background-color: #836fff;
+        }
+        button:disabled {
+            background-color: #444;
+            cursor: not-allowed;
+        }
+        #registration_status {
+            margin-top: 20px;
+            color: #00ff7f; /* Green for success, can be changed for errors */
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid #8a8a8a;
+            border-radius: 4px;
+            color: #8a8a8a;
+            text-decoration: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #333;
+            color: #f0f0f0;
+        }
+        .alert {
+            color: #ff4d4d; /* Red for error */
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ff4d4d;
+            border-radius: 4px;
+            background-color: #331a1a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voice Registration</h1>
+        <p>Please follow the instructions below to register your voice.</p>
+
+        <div id="registration-steps">
+            <div class="step">
+                <h3>Voice Sample 1</h3>
+                <p>Please read the following aloud:</p>
+                <textarea readonly rows="7">Hello! I’m reading this passage to help train a voice recognition system.
+Every sound I produce, from soft whispers to clear and crisp words, helps the model learn my unique vocal signature.
+I speak naturally, using low and high tones, short and long words, and a variety of expressions.</textarea>
+                <button id="record1">Record Voice 1</button>
+                <audio id="audio1" controls></audio>
+            </div>
+
+            <div class="step">
+                <h3>Voice Sample 2</h3>
+                <p>Please read the following aloud:</p>
+                <textarea readonly rows="7">Hello! I’m reading this passage to help train a voice recognition system.
+Every sound I produce, from soft whispers to clear and crisp words, helps the model learn my unique vocal signature.
+I speak naturally, using low and high tones, short and long words, and a variety of expressions.</textarea>
+                <button id="record2">Record Voice 2</button>
+                <audio id="audio2" controls></audio>
+            </div>
+
+            <div class="step">
+                <h3>Your Secret Phrase</h3>
+                <p>Please speak your secret phrase (password-like):</p>
+                <button id="record_prompt">Record Prompt</button>
+                <audio id="audio_prompt" controls></audio>
+            </div>
+
+            <button id="submit_registration" disabled>Submit Registration</button>
+            <p id="registration_status"></p>
+        </div>
+
+        <a href="/" class="button back-button">Back to Home</a>
+        <div id="alert-container"></div>
+    </div>
+
+    <script>
+        let recordings = {};
+        let recorder;
+
+        async function startRecording(buttonId, audioId) {
+            console.log('startRecording - Recorder state:', recorder ? recorder.state : 'undefined');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log('getUserMedia successful - Audio tracks:');
+                stream.getAudioTracks().forEach(track => console.log('Audio track:', track));
+
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+
+                // Using a widely supported MIME type
+                recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+                const chunks = [];
+
+                recorder.ondataavailable = event => {
+                    console.log('ondataavailable:', event);
+                    if (event.data.size > 0) {
+                        chunks.push(event.data);
+                    }
+                };
+
+                recorder.onstop = async () => {
+                    console.log('onstop - Chunks:', chunks);
+                    const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+                    console.log("Blob MIME Type (" + buttonId + "):", audioBlob.type);
+                    recordings[buttonId] = audioBlob;
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    document.getElementById(audioId).src = audioUrl;
+                    stream.getTracks().forEach(track => track.stop());
+                    checkIfAllRecorded();
+                    document.getElementById(buttonId).textContent = 'Record Again';
+                    document.getElementById(buttonId).onclick = () => startRecording(buttonId, audioId);
+                };
+
+                recorder.start();
+                document.getElementById(buttonId).textContent = 'Stop Recording';
+                document.getElementById(buttonId).onclick = () => stopRecording(buttonId, audioId);
+
+            } catch (err) {
+                console.error('getUserMedia error:', err);
+                let errorMessage = "Error accessing microphone.";
+                if (err.name === 'NotAllowedError') {
+                    errorMessage = "Microphone access was denied. Please check your browser settings to allow microphone access for this site.";
+                } else if (err.name === 'NotFoundError') {
+                    errorMessage = "No microphone device found. Please ensure you have a microphone connected and enabled.";
+                } else if (err.name === 'NotReadableError') {
+                    errorMessage = "The microphone is already in use by another application.";
+                }
+                document.getElementById('registration_status').textContent = errorMessage;
+                const alertContainer = document.getElementById('alert-container');
+                if (alertContainer) {
+                    alertContainer.innerHTML = `<div class="alert">${errorMessage}</div>`;
+                    setTimeout(() => {
+                        alertContainer.innerHTML = '';
+                    }, 5000);
+                }
+                // Revert button state on error
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    button.textContent = 'Record Again';
+                    button.onclick = () => startRecording(buttonId, audioId);
+                }
+            }
+        }
+
+        function stopRecording(buttonId, audioId) {
+            console.log('stopRecording - Recorder state:', recorder ? recorder.state : 'undefined');
+            if (recorder && recorder.state === 'recording') {
+                recorder.stop();
+            }
+            // The onstop event handler will handle the rest
+        }
+
+        function checkIfAllRecorded() {
+            if (recordings['record1'] && recordings['record2'] && recordings['record_prompt']) {
+                document.getElementById('submit_registration').disabled = false;
+            }
+        }
+
+        document.getElementById('record1').onclick = () => startRecording('record1', 'audio1');
+        document.getElementById('record2').onclick = () => startRecording('record2', 'audio2');
+        document.getElementById('record_prompt').onclick = () => startRecording('record_prompt', 'audio_prompt');
+
+        document.getElementById('submit_registration').addEventListener('click', async () => {
+            document.getElementById('registration_status').textContent = 'Processing...';
+            const formData = new FormData();
+            if (recordings['record1']) {
+                formData.append('audio_train1', recordings['record1'], 'voice_train1.webm'); // Use .webm extension
+            }
+            if (recordings['record2']) {
+                formData.append('audio_train2', recordings['record2'], 'voice_train2.webm'); // Use .webm extension
+            }
+            if (recordings['record_prompt']) {
+                formData.append('audio_prompt', recordings['record_prompt'], 'voice_prompt.webm'); // Use .webm extension
+            }
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                document.getElementById('registration_status').textContent = data.message;
+                if (data.success) {
+                    window.location.href = '/authenticate';
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                document.getElementById('registration_status').textContent = 'Registration failed.';
+            }
+        });
+    </script>
+</body>
+</html>

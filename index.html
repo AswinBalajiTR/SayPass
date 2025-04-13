@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Authentication</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Voice Authentication</h1>
+
+    <section>
+      <h2>📝 Registration</h2>
+      <p>Please read the paragraph below aloud:</p>
+      <blockquote>
+        Hello! I’m reading this passage to help train a voice recognition system.
+        Every sound I produce, from soft whispers to clear and crisp words, helps the model learn my unique vocal signature.
+        I speak naturally, using low and high tones, short and long words, and a variety of expressions.
+      </blockquote>
+      <button onclick="register()">🎙️ Register Voice</button>
+    </section>
+
+    <section>
+      <h2>🔍 Authentication</h2>
+      <button onclick="authenticate()">🎤 Authenticate Me</button>
+    </section>
+
+    <div id="status">Status: Waiting...</div>
+  </div>
+
+  <script>
+    async function register() {
+      document.getElementById("status").innerText = "Recording for registration...";
+      const res = await fetch("/register", { method: "POST" });
+      const data = await res.json();
+      document.getElementById("status").innerText = data.status === "registered" ? "✅ Registered!" : "❌ Failed to register.";
+    }
+
+    async function authenticate() {
+      document.getElementById("status").innerText = "Verifying... please wait.";
+      const res = await fetch("/verify", { method: "POST" });
+      const data = await res.json();
+      document.getElementById("status").innerText = data.status === "granted" ? "✅ Access Granted!" : "❌ Access Denied!";
+    }
+  </script>
+</body>
+</html>
