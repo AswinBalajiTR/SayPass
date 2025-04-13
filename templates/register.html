@@ -281,9 +281,9 @@
         document.getElementById('submit_registration').addEventListener('click', async () => {
             document.getElementById('registration_status').textContent = 'Processing...';
             const formData = new FormData();
-            for (const key in recordings) {
-                formData.append(key.replace('record', 'audio_train').replace('prompt', 'prompt'), recordings[key], `${key}.webm`);
-            }
+            formData.append('audio_train1', recordings['record1'], 'audio_train1.webm');
+            formData.append('audio_train2', recordings['record2'], 'audio_train2.webm');
+            formData.append('prompt', recordings['record_prompt'], 'prompt.webm');
 
             try {
                 const response = await fetch('/register', {
@@ -293,11 +293,26 @@
                 const data = await response.json();
                 document.getElementById('registration_status').textContent = data.message;
                 if (data.success) {
-                    window.location.href = '/authenticate';
+                    window.location.href = '/authenticate_page';
+                } else {
+                    const alertContainer = document.getElementById('alert-container');
+                    if (alertContainer) {
+                        alertContainer.innerHTML = `<div class="alert">${data.message}</div>`;
+                        setTimeout(() => {
+                            alertContainer.innerHTML = '';
+                        }, 5000);
+                    }
                 }
             } catch (error) {
                 console.error("Error during registration:", error);
-                document.getElementById('registration_status').textContent = 'Registration failed.';
+                document.getElementById('registration_status').textContent = 'Registration failed due to a network error.';
+                const alertContainer = document.getElementById('alert-container');
+                if (alertContainer) {
+                    alertContainer.innerHTML = `<div class="alert">Network error during registration. Please try again.</div>`;
+                    setTimeout(() => {
+                        alertContainer.innerHTML = '';
+                    }, 5000);
+                }
             }
         });
     </script>
